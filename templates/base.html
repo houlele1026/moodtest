@@ -69,7 +69,7 @@
       display: inline-block;
       text-align: center;
     }
-    .button.secondary {
+    button.secondary, .button.secondary {
       background: #fff;
       color: var(--text);
       border: 1px solid var(--line);
@@ -121,6 +121,84 @@
     }
     .brief-list {
       margin: 8px 0 0 18px;
+    }
+    .chat-shell {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .brief-strip {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 250, 244, 0.96);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 8px 24px rgba(86, 58, 31, 0.09);
+      margin-bottom: 14px;
+      backdrop-filter: blur(8px);
+      font-size: 13px;
+    }
+    .brief-strip-header {
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .brief-strip-header strong {
+      color: var(--accent-2);
+      white-space: nowrap;
+    }
+    .brief-strip-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .brief-strip-grid b {
+      display: block;
+      margin-bottom: 3px;
+    }
+    .brief-strip-grid p,
+    .brief-strip-grid li {
+      line-height: 1.45;
+    }
+    .brief-strip-grid p {
+      margin: 0;
+    }
+    .brief-list.compact {
+      margin: 0 0 0 16px;
+      padding: 0;
+    }
+    .history-summary {
+      background: rgba(255, 250, 244, 0.72);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+    .history-summary summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .history-summary .chat-msg {
+      margin: 12px 0 0;
+    }
+    .chat-card {
+      min-height: 360px;
+    }
+    @media (max-width: 720px) {
+      .brief-strip {
+        top: 0;
+        max-height: 42vh;
+        overflow: auto;
+      }
+      .brief-strip-header {
+        display: block;
+      }
+      .brief-strip-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>

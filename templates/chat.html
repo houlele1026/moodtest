@@ -10,61 +10,67 @@
   <p class="muted">当你觉得本次 session 已完成时，点击“结束并填写评分”。</p>
 </div>
 
-<div class="grid two">
-  <div>
-    <div class="card">
-      <h2>当前 Session Brief</h2>
-      <p>{{ session_brief.tester_brief }}</p>
-      <h3>必达点</h3>
-      <ul class="brief-list">
-        {% for item in session_brief.must_cover %}
-        <li>{{ item }}</li>
-        {% endfor %}
-      </ul>
-      <h3>可选透露点</h3>
-      <ul class="brief-list">
-        {% for item in session_brief.optional_reveals %}
-        <li>{{ item }}</li>
-        {% endfor %}
-      </ul>
-      <h3>挑战点</h3>
-      <p>{{ session_brief.challenge_point }}</p>
+<div class="chat-shell">
+  <div class="brief-strip">
+    <div class="brief-strip-header">
+      <strong>Session Brief</strong>
+      <span>{{ session_brief.tester_brief }}</span>
     </div>
+    <div class="brief-strip-grid">
+      <div>
+        <b>必达点</b>
+        <ul class="brief-list compact">
+          {% for item in session_brief.must_cover %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>
+        <b>可选透露点</b>
+        <ul class="brief-list compact">
+          {% for item in session_brief.optional_reveals %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>
+        <b>挑战点</b>
+        <p>{{ session_brief.challenge_point }}</p>
+      </div>
+    </div>
+  </div>
 
-    {% if state.history_summary_rendered %}
-    <div class="card">
-      <h2>本次注入的历史摘要</h2>
-      <div class="chat-msg chat-assistant">{{ state.history_summary_rendered }}</div>
-    </div>
+  {% if state.history_summary_rendered %}
+  <details class="history-summary">
+    <summary>本次注入的历史摘要</summary>
+    <div class="chat-msg chat-assistant">{{ state.history_summary_rendered }}</div>
+  </details>
+  {% endif %}
+
+  <div class="card chat-card">
+    <h2>对话</h2>
+    {% if conversation %}
+      {% for message in conversation %}
+        <div class="chat-msg {{ 'chat-user' if message.role == 'user' else 'chat-assistant' }}">
+          <strong>{{ '你' if message.role == 'user' else '助手' }}</strong><br>
+          {{ message.content }}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="muted">还没有消息，直接输入第一句开始。</p>
     {% endif %}
   </div>
 
-  <div>
-    <div class="card">
-      <h2>对话</h2>
-      {% if conversation %}
-        {% for message in conversation %}
-          <div class="chat-msg {{ 'chat-user' if message.role == 'user' else 'chat-assistant' }}">
-            <strong>{{ '你' if message.role == 'user' else '助手' }}</strong><br>
-            {{ message.content }}
-          </div>
-        {% endfor %}
-      {% else %}
-        <p class="muted">还没有消息，直接输入第一句开始。</p>
-      {% endif %}
-    </div>
-
-    <div class="card">
-      <form method="post">
-        <label for="user_input">输入消息</label>
-        <textarea id="user_input" name="user_input" placeholder="输入你的下一句。"></textarea>
-        <div style="height: 12px;"></div>
-        <div class="row">
-          <button type="submit" name="action" value="send">发送</button>
-          <button type="submit" name="action" value="end" class="secondary">结束并填写评分</button>
-        </div>
-      </form>
-    </div>
+  <div class="card">
+    <form method="post">
+      <label for="user_input">输入消息</label>
+      <textarea id="user_input" name="user_input" placeholder="输入你的下一句。"></textarea>
+      <div style="height: 12px;"></div>
+      <div class="row">
+        <button type="submit" name="action" value="send">发送</button>
+        <button type="submit" name="action" value="end" class="secondary">结束并填写评分</button>
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}
