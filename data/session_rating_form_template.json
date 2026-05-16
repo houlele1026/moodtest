@@ -1,0 +1,32 @@
+{
+  "tester_id": "",
+  "episode_id": "",
+  "session_id": "",
+  "model_blind_id": "",
+  "part_type": "",
+  "scale": {
+    "type": "likert_1_to_5",
+    "labels": {
+      "1": "非常不同意",
+      "2": "不同意",
+      "3": "一般",
+      "4": "同意",
+      "5": "非常同意"
+    }
+  },
+  "ratings": {
+    "felt_understood": null,
+    "natural_empathy": null,
+    "matched_current_need": null,
+    "low_template_feeling": null,
+    "natural_history_usage": null,
+    "willing_to_continue": null,
+    "non_preachy": null,
+    "overall_supportiveness": null
+  },
+  "free_text": {
+    "best_moment": "",
+    "worst_moment": "",
+    "one_sentence_impression": ""
+  }
+}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>Dashboard</h1>
+  <p>当前测试者：<strong>{{ tester_id }}</strong></p>
+  <p class="muted">请选择本次要进行的 episode、session 与盲测模型。S2/S3 的历史摘要建议由实验管理员提前整理好后再粘贴。</p>
+</div>
+
+{% for episode in episodes %}
+<div class="card">
+  <div class="row">
+    <div>
+      <span class="tag">{{ episode.episode_id }}</span>
+      <span class="tag">{{ "角色扮演" if episode.part_type == "role_play" else "真实经历" }}</span>
+      <h2>{{ episode.title }}</h2>
+      <p>{{ episode.theme }}</p>
+    </div>
+  </div>
+  <div class="grid two">
+    {% for session in episode.sessions %}
+    <div class="card" style="margin-bottom: 0;">
+      <h3>{{ session.session_id }} · {{ session.focus }}</h3>
+      <p class="small muted">{{ session.tester_brief }}</p>
+      <div class="row">
+        <a class="button" href="{{ url_for('start_session', episode_id=episode.episode_id, session_id=session.session_id, model_blind_id='A') }}">开始模型 A</a>
+        <a class="button secondary" href="{{ url_for('start_session', episode_id=episode.episode_id, session_id=session.session_id, model_blind_id='B') }}">开始模型 B</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div style="height: 12px;"></div>
+  <div class="row">
+    <a class="button secondary" href="{{ url_for('rate_episode', episode_id=episode.episode_id, model_blind_id='A') }}">填写模型 A 的 Episode 评分</a>
+    <a class="button secondary" href="{{ url_for('rate_episode', episode_id=episode.episode_id, model_blind_id='B') }}">填写模型 B 的 Episode 评分</a>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

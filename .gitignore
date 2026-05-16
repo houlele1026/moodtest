@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+storage/logs/
+storage/active_sessions/
+config/model_config.json
+.env

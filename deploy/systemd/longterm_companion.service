@@ -1,0 +1,16 @@
+[Unit]
+Description=Long-Term Companion Web Experiment
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/MoodBench
+EnvironmentFile=/etc/longterm_companion_web.env
+ExecStart=/opt/MoodBench/.venv/bin/waitress-serve --host=127.0.0.1 --port=5055 experiments.longterm_companion_web.app:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

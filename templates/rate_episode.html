@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>Episode 评分</h1>
+  <p>测试者：<strong>{{ tester_id }}</strong> ｜ Episode：<strong>{{ episode_id }}</strong> ｜ 模型：<strong>{{ model_blind_id }}</strong></p>
+  <p class="muted">建议在该 episode 的 3 个 session 全部完成后填写。</p>
+</div>
+
+<form method="post" class="card">
+  {% for field, label in episode_rating_fields %}
+  <label for="{{ field }}">{{ loop.index }}. {{ label }}</label>
+  <select id="{{ field }}" name="{{ field }}" required>
+    <option value="">请选择</option>
+    {% for score, score_label in score_labels.items() %}
+    <option value="{{ score }}">{{ score }} - {{ score_label }}</option>
+    {% endfor %}
+  </select>
+  <div style="height: 12px;"></div>
+  {% endfor %}
+
+  <label for="summary_impression">summary impression</label>
+  <textarea id="summary_impression" name="summary_impression"></textarea>
+  <div style="height: 12px;"></div>
+
+  <label for="main_strength">main strength</label>
+  <textarea id="main_strength" name="main_strength"></textarea>
+  <div style="height: 12px;"></div>
+
+  <label for="main_weakness">main weakness</label>
+  <textarea id="main_weakness" name="main_weakness"></textarea>
+  <div style="height: 12px;"></div>
+
+  <label for="preferred_model_blind_id">如果继续长期聊，你更愿意选择哪个模型？</label>
+  <select id="preferred_model_blind_id" name="preferred_model_blind_id" required>
+    <option value="">请选择</option>
+    <option value="A">A</option>
+    <option value="B">B</option>
+  </select>
+  <div style="height: 12px;"></div>
+
+  <label for="preference_reason">偏好原因</label>
+  <textarea id="preference_reason" name="preference_reason"></textarea>
+  <div style="height: 12px;"></div>
+
+  <button type="submit">保存 Episode 评分</button>
+</form>
+{% endblock %}

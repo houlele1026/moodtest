@@ -1,0 +1,13 @@
+{
+  "persona_summary": "",
+  "emotional_priorities": [""],
+  "relationship_history_summary": [""],
+  "key_emotional_events": [""],
+  "helpful_response_patterns": [""],
+  "unhelpful_response_patterns": [""],
+  "latest_session_excerpt": [
+    { "role": "user", "content": "" },
+    { "role": "assistant", "content": "" }
+  ],
+  "current_session_opening": ""
+}

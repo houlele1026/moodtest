@@ -1,0 +1,27 @@
+{
+  "pilot_name": "longterm_companion_v1",
+  "models": [
+    {
+      "blind_id": "A",
+      "provider": "openai",
+      "model_identifier": "deepseek-v3.2",
+      "api_key_env": "MODEL_A_API_KEY",
+      "base_url": "https://api.chatanywhere.tech/v1",
+      "generation_kwargs": {
+        "temperature": 0.7,
+        "max_tokens": 800
+      }
+    },
+    {
+      "blind_id": "B",
+      "provider": "openai",
+      "model_identifier": "gpt-4o",
+      "api_key_env": "MODEL_B_API_KEY",
+      "base_url": "https://api.chatanywhere.tech/v1",
+      "generation_kwargs": {
+        "temperature": 0.7,
+        "max_tokens": 800
+      }
+    }
+  ]
+}

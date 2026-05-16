@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <span class="tag">远程实验台</span>
+  <span class="tag">长期陪伴</span>
+  <h1>长期情感陪伴能力实验台</h1>
+  <p class="muted">测试者只需要浏览器即可完成聊天与评分。模型 API key 仅保留在服务器端。</p>
+</div>
+
+<div class="card">
+  <h2>进入实验</h2>
+  <form method="post" action="{{ url_for('login') }}">
+    <label for="tester_id">测试者编号</label>
+    <input id="tester_id" name="tester_id" placeholder="例如 T01" required>
+    <div style="height: 12px;"></div>
+    <button type="submit">进入 Dashboard</button>
+  </form>
+</div>
+{% endblock %}

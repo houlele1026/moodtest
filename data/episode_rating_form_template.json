@@ -1,0 +1,32 @@
+{
+  "tester_id": "",
+  "episode_id": "",
+  "model_blind_id": "",
+  "part_type": "",
+  "scale": {
+    "type": "likert_1_to_5",
+    "labels": {
+      "1": "非常不同意",
+      "2": "不同意",
+      "3": "一般",
+      "4": "同意",
+      "5": "非常同意"
+    }
+  },
+  "ratings": {
+    "continuity_across_sessions": null,
+    "emotional_stability": null,
+    "trust": null,
+    "repair_ability": null,
+    "overall_companionship_quality": null
+  },
+  "free_text": {
+    "summary_impression": "",
+    "main_strength": "",
+    "main_weakness": ""
+  },
+  "paired_preference": {
+    "preferred_model_blind_id": "",
+    "reason": ""
+  }
+}

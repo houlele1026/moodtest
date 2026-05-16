@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <p><a href="{{ url_for('dashboard') }}">返回 Dashboard</a></p>
+  <span class="tag">{{ episode.episode_id }}</span>
+  <span class="tag">{{ session.session_id }}</span>
+  <span class="tag">模型 {{ model_blind_id }}</span>
+  <h1>{{ episode.title }}</h1>
+  <p>{{ episode.theme }}</p>
+</div>
+
+<div class="grid two">
+  <div class="card">
+    <h2>Session Brief</h2>
+    <p>{{ session.tester_brief }}</p>
+    <h3>必达点</h3>
+    <ul class="brief-list">
+      {% for item in session.must_cover %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+    <h3>可选透露点</h3>
+    <ul class="brief-list">
+      {% for item in session.optional_reveals %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+    <h3>挑战点</h3>
+    <p>{{ session.challenge_point }}</p>
+  </div>
+
+  <div class="card">
+    <h2>开始设置</h2>
+    <form method="post">
+      <label for="history_summary">历史摘要文本</label>
+      <textarea id="history_summary" name="history_summary" placeholder="S1 可留空；S2/S3 建议由实验管理员提供标准化历史摘要。"></textarea>
+      <div style="height: 12px;"></div>
+      <label for="max_turns">最大轮数</label>
+      <input id="max_turns" name="max_turns" type="number" min="1" max="30" value="12" required>
+      <div style="height: 12px;"></div>
+      <button type="submit">进入聊天</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

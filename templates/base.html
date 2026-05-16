@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or "长期情感陪伴能力实验台" }}</title>
+  <style>
+    :root {
+      --bg: #f5efe6;
+      --panel: #fffaf4;
+      --text: #1e1d1a;
+      --muted: #70685d;
+      --line: #ddd1c0;
+      --accent: #9d4edd;
+      --accent-2: #0f766e;
+      --warn: #a16207;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(180deg, #f7f0e8 0%, #efe6da 100%);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(86, 58, 31, 0.06);
+      margin-bottom: 18px;
+    }
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+    .grid.two {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+    p, li {
+      line-height: 1.65;
+    }
+    input, textarea, select, button {
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      font: inherit;
+      background: #fff;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    button, .button {
+      background: linear-gradient(135deg, #2a9d8f 0%, #3a86ff 100%);
+      color: #fff;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      display: inline-block;
+      text-align: center;
+    }
+    .button.secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+    .tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #f1e6ff;
+      color: #6b21a8;
+      font-size: 12px;
+      margin-right: 8px;
+    }
+    .muted {
+      color: var(--muted);
+    }
+    .flash {
+      background: #fff7d6;
+      border: 1px solid #f3d67a;
+      color: #7c5c00;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+    .chat-msg {
+      padding: 14px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+    }
+    .chat-user {
+      background: #edf6ff;
+      border: 1px solid #cfe4ff;
+    }
+    .chat-assistant {
+      background: #f9f7f2;
+      border: 1px solid #e6dccd;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .row > * {
+      flex: 1;
+    }
+    .small {
+      font-size: 13px;
+    }
+    .brief-list {
+      margin: 8px 0 0 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>Session 评分</h1>
+  <p>测试者：<strong>{{ tester_id }}</strong> ｜ Episode：<strong>{{ episode_id }}</strong> ｜ Session：<strong>{{ session_id }}</strong> ｜ 模型：<strong>{{ model_blind_id }}</strong></p>
+  <p class="muted">请根据刚刚那次真实体验完成评分。</p>
+</div>
+
+<form method="post" class="card">
+  {% for field, label in session_rating_fields %}
+  <label for="{{ field }}">{{ loop.index }}. {{ label }}</label>
+  <select id="{{ field }}" name="{{ field }}" required>
+    <option value="">请选择</option>
+    {% for score, score_label in score_labels.items() %}
+    <option value="{{ score }}">{{ score }} - {{ score_label }}</option>
+    {% endfor %}
+  </select>
+  <div style="height: 12px;"></div>
+  {% endfor %}
+
+  <label for="best_moment">best moment</label>
+  <textarea id="best_moment" name="best_moment"></textarea>
+  <div style="height: 12px;"></div>
+
+  <label for="worst_moment">worst moment</label>
+  <textarea id="worst_moment" name="worst_moment"></textarea>
+  <div style="height: 12px;"></div>
+
+  <label for="one_sentence_impression">one-sentence impression</label>
+  <textarea id="one_sentence_impression" name="one_sentence_impression"></textarea>
+  <div style="height: 12px;"></div>
+
+  <button type="submit">保存 Session 评分</button>
+</form>
+{% endblock %}
