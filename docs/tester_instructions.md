@@ -2,7 +2,17 @@
 
 ## 1. 你的任务
 
-你需要和两个盲测模型分别完成多个 session 的对话，并在每次结束后立即填写评分。
+你会在网页实验台中完成若干个 episode。
+每个 episode 包含 3 个 session。
+
+每次 session 的基本流程是：
+
+登录实验台
+进入指定的 episode / session / 模型
+阅读页面上的 Session Brief
+与模型进行对话
+对话结束后填写 Session 评分表
+在同一个 episode 的 3 个 session 都完成后，再填写 Episode 评分表
 
 ## 2. 核心原则
 

@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import uuid
 from copy import deepcopy
 from datetime import datetime
@@ -158,6 +159,133 @@ def create_state_path(run_id: str) -> Path:
     return ACTIVE_SESSIONS_DIR / f"{run_id}.json"
 
 
+def create_memory_path(tester_id: str, episode_id: str, model_blind_id: str) -> Path:
+    return LOGS_DIR / f"tester_{tester_id}" / episode_id / f"memory_{model_blind_id}.json"
+
+
+def load_memory(tester_id: str, episode_id: str, model_blind_id: str) -> Dict[str, Any]:
+    memory_path = create_memory_path(tester_id, episode_id, model_blind_id)
+    if memory_path.exists():
+        return load_json(memory_path)
+    return {}
+
+
+def clean_list(values: Any) -> List[str]:
+    if not isinstance(values, list):
+        return []
+    return [str(item).strip() for item in values if str(item).strip()]
+
+
+def render_memory_for_prompt(memory: Dict[str, Any]) -> str:
+    if not memory:
+        return ""
+    if memory.get("raw_summary"):
+        return str(memory["raw_summary"]).strip()
+
+    sections = []
+    persona_summary = str(memory.get("persona_summary", "")).strip()
+    if persona_summary:
+        sections.append(f"[用户画像摘要]\n{persona_summary}")
+
+    list_fields = [
+        ("emotional_priorities", "用户当前最在意的情绪点"),
+        ("relationship_history_summary", "到目前为止的关系与对话历史摘要"),
+        ("key_emotional_events", "关键情绪事件"),
+        ("helpful_response_patterns", "之前看起来有帮助的回应方式"),
+        ("unhelpful_response_patterns", "之前看起来没有帮助的回应方式"),
+    ]
+    for field, title in list_fields:
+        items = clean_list(memory.get(field))
+        if items:
+            sections.append(f"[{title}]\n" + "\n".join(f"- {item}" for item in items))
+
+    excerpts = memory.get("latest_session_excerpt")
+    if isinstance(excerpts, list) and excerpts:
+        lines = []
+        for item in excerpts:
+            if not isinstance(item, dict):
+                continue
+            role = "用户" if item.get("role") == "user" else "助手"
+            content = str(item.get("content", "")).strip()
+            if content:
+                lines.append(f"{role}：{content}")
+        if lines:
+            sections.append("[最近一次 session 的短摘录]\n" + "\n".join(lines))
+
+    opening = str(memory.get("current_session_opening", "")).strip()
+    if opening:
+        sections.append(f"[本次新的开场建议]\n{opening}")
+
+    return "\n\n".join(sections).strip()
+
+
+def parse_json_response(text: str) -> Dict[str, Any]:
+    cleaned = text.strip()
+    fence_match = re.search(r"```(?:json)?\s*(.*?)```", cleaned, flags=re.DOTALL)
+    if fence_match:
+        cleaned = fence_match.group(1).strip()
+    return json.loads(cleaned)
+
+
+def render_conversation_for_memory(conversation: List[Dict[str, Any]]) -> str:
+    lines = []
+    for item in conversation:
+        role = "用户" if item["role"] == "user" else "助手"
+        lines.append(f"{role}: {item['content']}")
+    return "\n".join(lines)
+
+
+def generate_memory_summary(model_config: Dict[str, Any], state: Dict[str, Any]) -> Dict[str, Any]:
+    previous_memory_text = state.get("history_summary_rendered", "").strip() or "无"
+    conversation_text = render_conversation_for_memory(state["conversation"])
+    prompt = f"""
+请基于“已有长期记忆”和“刚结束的本次对话”，更新一份用于下一次情感陪伴 session 的累计记忆。
+
+要求：
+- 只保留对下一次继续陪伴有帮助的信息。
+- 不要编造对话中没有出现的事实。
+- 重点记录情绪主线、用户在意点、有效/无效回应方式。
+- 输出必须是一个 JSON 对象，不要输出解释文字。
+- 字段必须包含：
+  persona_summary: string
+  emotional_priorities: string[]
+  relationship_history_summary: string[]
+  key_emotional_events: string[]
+  helpful_response_patterns: string[]
+  unhelpful_response_patterns: string[]
+  latest_session_excerpt: object[]，每项包含 role 和 content
+  current_session_opening: string
+
+[已有长期记忆]
+{previous_memory_text}
+
+[刚结束的本次对话]
+{conversation_text}
+""".strip()
+
+    client = create_client(model_config)
+    reply = chat_once(
+        client,
+        model_config,
+        [
+            {
+                "role": "system",
+                "content": "你是严谨的实验辅助工具，负责把情感陪伴对话压缩成简洁、忠实、可继续使用的长期记忆。",
+            },
+            {"role": "user", "content": prompt},
+        ],
+    )
+    try:
+        memory = parse_json_response(reply)
+    except Exception:
+        memory = {"raw_summary": reply}
+
+    memory["updated_at"] = now_iso()
+    memory["source_session_id"] = state["session_id"]
+    memory["source_run_id"] = state["run_id"]
+    return memory
+
+
 def render_transcript(conversation: List[Dict[str, Any]], metadata: Dict[str, Any]) -> str:
     lines = [
         "# Session Transcript",
@@ -260,20 +388,21 @@ def start_session(episode_id: str, session_id: str, model_blind_id: str):
 
     episode = get_episode(episode_id)
     session_brief = get_session_brief(episode, session_id)
+    auto_memory = load_memory(tester_id, episode_id, model_blind_id)
+    auto_memory_text = render_memory_for_prompt(auto_memory)
 
     if request.method == "POST":
-        history_summary = request.form.get("history_summary", "").strip()
         max_turns = int(request.form.get("max_turns", "12"))
         run_id = uuid.uuid4().hex
         system_prompt = load_system_prompt()
         messages = [{"role": "system", "content": system_prompt}]
-        if history_summary:
+        if auto_memory_text:
             messages.append({
                 "role": "system",
                 "content": (
-                    "以下是为保持跨 session 连续性而提供的标准化历史摘要。"
-                    "请自然使用，不要生硬引用，也不要编造不存在的关系细节。\n\n"
-                    f"{history_summary}"
+                    "以下是系统自动保存的跨 session 历史记忆，用于保持长期陪伴的连续性。"
+                    "请自然使用，不要生硬复述，不要把它当作审问清单，也不要编造不存在的关系细节。\n\n"
+                    f"{auto_memory_text}"
                 ),
             })
 
@@ -285,7 +414,8 @@ def start_session(episode_id: str, session_id: str, model_blind_id: str):
             "part_type": episode["part_type"],
             "model_blind_id": model_blind_id,
             "system_prompt": system_prompt,
-            "history_summary_rendered": history_summary,
+            "history_summary_rendered": auto_memory_text,
+            "memory_snapshot": auto_memory,
             "messages": messages,
             "conversation": [],
             "started_at": now_iso(),
@@ -301,6 +431,7 @@ def start_session(episode_id: str, session_id: str, model_blind_id: str):
         episode=episode,
         session=session_brief,
         model_blind_id=model_blind_id,
+        auto_memory_text=auto_memory_text,
     )
 
 
@@ -404,6 +535,19 @@ def finish_session(run_id: str):
     save_json(log_dir / "session_log.json", log_payload)
     save_text(log_dir / "transcript.md", render_transcript(state["conversation"], {**state, "ended_at": ended_at}))
 
+    memory_generation_error = ""
+    if state["conversation"]:
+        try:
+            memory_summary = generate_memory_summary(model_config, state)
+            save_json(create_memory_path(state["tester_id"], state["episode_id"], state["model_blind_id"]), memory_summary)
+            save_json(log_dir / "memory_summary.json", memory_summary)
+        except Exception as exc:
+            memory_generation_error = str(exc)
+            save_json(log_dir / "memory_summary_error.json", {
+                "error": memory_generation_error,
+                "time": now_iso(),
+            })
+
     session_rating = build_blank_rating(
         "session_rating_form_template.json",
         state["tester_id"],
@@ -425,6 +569,8 @@ def finish_session(run_id: str):
     save_json(log_dir / "episode_rating.json", episode_rating)
 
     state_path.unlink(missing_ok=True)
+    if memory_generation_error:
+        flash(f"本次评分可继续填写，但自动长期记忆生成失败：{memory_generation_error}")
     return redirect(
         url_for(
             "rate_session",

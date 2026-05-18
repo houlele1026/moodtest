@@ -31,10 +31,13 @@
 
   <div class="card">
     <h2>开始设置</h2>
+    <h3>本次自动注入的长期记忆</h3>
+    {% if auto_memory_text %}
+      <div class="chat-msg chat-assistant">{{ auto_memory_text }}</div>
+    {% else %}
+      <p class="muted">暂无历史记忆。本次会从全新对话开始，结束后系统会自动生成下一次可用的记忆摘要。</p>
+    {% endif %}
     <form method="post">
-      <label for="history_summary">历史摘要文本</label>
-      <textarea id="history_summary" name="history_summary" placeholder="S1 可留空；S2/S3 建议由实验管理员提供标准化历史摘要。"></textarea>
-      <div style="height: 12px;"></div>
       <label for="max_turns">最大轮数</label>
       <input id="max_turns" name="max_turns" type="number" min="1" max="30" value="12" required>
       <div style="height: 12px;"></div>
